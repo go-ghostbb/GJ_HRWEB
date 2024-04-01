@@ -60,6 +60,10 @@ export const useEmployeeStore = defineStore({
       setAuthCache(ROLES_KEY, roleList);
     },
     setEmployeeInfo(info: EmployeeInfo | null) {
+      if (info && info.avatar !== '') {
+        //- /assets/employee/:employeeID/:filename
+        info.avatar = `${import.meta.env.VITE_GLOB_API_URL}/assets/employee/${info.employeeId}/${info.avatar}`;
+      }
       this.employeeInfo = info;
       this.lastUpdateTime = new Date().getTime();
       setAuthCache(EMPLOYEE_INFO_KEY, info);

@@ -71,6 +71,9 @@
    * @description 清除
    */
   const clear = () => {
+    if (props.disabled) {
+      return;
+    }
     currentName.value = '';
     currentId.value = 0;
     currentMinimum.value = 0;

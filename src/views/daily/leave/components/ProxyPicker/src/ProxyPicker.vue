@@ -71,6 +71,9 @@
    * @description 清除
    */
   const clear = () => {
+    if (props.disabled) {
+      return;
+    }
     currentEmployeeRealName.value = '';
     currentEmployeeId.value = 0;
     currentDepartmentId.value = 0;

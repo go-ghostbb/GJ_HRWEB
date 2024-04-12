@@ -1,6 +1,7 @@
 import { ErrorTypeEnum } from '@/enums/exceptionEnum';
 import { MenuModeEnum, MenuTypeEnum } from '@/enums/menuEnum';
 import { RoleInfo } from '@/api/sys/model/employeeModel';
+import { DepartmentModel } from '@/api/database/department/model/departmentModel';
 
 // Lock screen information
 export interface LockInfo {
@@ -38,6 +39,7 @@ export interface ErrorLogInfo {
 export interface EmployeeInfo {
   employeeId: string | number;
   departmentId: string | number;
+  department: DepartmentModel;
   account: string;
   realName: string;
   avatar: string;

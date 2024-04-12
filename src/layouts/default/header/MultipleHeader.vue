@@ -84,7 +84,7 @@
       setHeaderHeight(height);
     }
     return {
-      height: `${height}px`,
+      height: `${height - 15}px`,
     };
   });
 

@@ -1,3 +1,5 @@
+import { DepartmentModel } from '@/api/database/department/model/departmentModel';
+
 /**
  * @description: Login interface parameters
  */
@@ -27,6 +29,8 @@ export interface GetEmployeeInfoModel {
   employeeId: string | number;
   // 部門id
   departmentId: string | number;
+  // 部門
+  department: DepartmentModel;
   // 帳號
   account: string;
   // 真实名字

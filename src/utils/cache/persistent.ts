@@ -14,15 +14,18 @@ import {
   APP_SESSION_CACHE_KEY,
   MULTIPLE_TABS_KEY,
   TABLE_SETTING_KEY,
+  DEPARTMENT_KET,
 } from '@/enums/cacheEnum';
 import { DEFAULT_CACHE_TIME } from '@/settings/encryptionSetting';
 import { toRaw } from 'vue';
 import { pick, omit } from 'lodash-es';
+import { DepartmentModel } from '@/api/database/department/model/departmentModel';
 
 interface BasicStore {
   [TOKEN_KEY]: string | number | null | undefined;
   [EMPLOYEE_INFO_KEY]: EmployeeInfo;
   [ROLES_KEY]: string[];
+  [DEPARTMENT_KET]: DepartmentModel;
   [LOCK_INFO_KEY]: LockInfo;
   [PROJ_CFG_KEY]: ProjectConfig;
   [MULTIPLE_TABS_KEY]: RouteLocationNormalized[];

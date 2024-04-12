@@ -1,0 +1,90 @@
+{
+  "global": {
+    "warning": "警告",
+    "sending": "送簽中",
+    "signing": "簽核中",
+    "approve": "核准",
+    "reject": "駁回"
+  },
+  "leave": {
+    "title": "請假單/申請",
+    "components": {
+      "LeaveCorePicker": {
+        "Modal": {
+          "title": "假別列表",
+          "get": "取回",
+          "nameTitle": "假別名稱",
+          "remarkTitle": "備註"
+        },
+        "placeholder": "點擊選擇假別"
+      },
+      "ProxyPicker": {
+        "Modal": {
+          "title": "人員列表",
+          "get": "取回",
+          "realNameTitle": "人員",
+          "departmentNameTitle": "部門"
+        },
+        "placeholder": "點擊選擇代理人"
+      }
+    },
+    "modal": {
+      "minimumWarning": "請假時間少於#分鐘，會以#分鐘做儲存，是否繼續?",
+      "saveText": "儲存",
+      "deleteText": "撤銷",
+      "addLeave": "新增請假單"
+    },
+    "error": {
+      "timeOverlap": "請假時間重複"
+    },
+    "addLeave": "新增請假單",
+    "leaveTitle": "請假單列表",
+    "updateSucc": "單號:# 更新成功",
+    "addSucc": "單號:# 新增成功",
+    "deleteSucc": "單號:# 刪除成功",
+    "signStatusTitle": "單況",
+    "orderTitle": "單號",
+    "createdAtTitle": "創建時間",
+    "leaveCoreNameTitle": "假別",
+    "departmentNameTitle": "請假部門",
+    "dateTitle": "日期",
+    "timeTitle": "時間",
+    "leaveMinuteCountTitle": "請假分鐘數",
+    "leaveHourCountTitle": "請假時數",
+    "leaveDayCountTitle": "請假天數",
+    "remarkTitle": "備註",
+    "proxyTitle": "代理人",
+    "attachTitle": "附件"
+  },
+  "overtime": {
+    "title": "加班單/申請",
+    "modal": {
+      "saveText": "儲存",
+      "deleteText": "撤銷",
+      "addOvertime": "新增加班單"
+    },
+    "addOvertime": "新增加班單",
+    "overtimeTitle": "加班單列表",
+    "updateSucc": "單號:# 更新成功",
+    "addSucc": "單號:# 新增成功",
+    "deleteSucc": "單號:# 刪除成功",
+    "signStatusTitle": "單況",
+    "orderTitle": "單號",
+    "createdAtTitle": "創建時間",
+    "departmentNameTitle": "加班部門",
+    "timeTitle": "時間",
+    "remarkTitle": "備註",
+    "dateTitle": "日期"
+  },
+  "signOff": {
+    "title": "簽核作業",
+    "signOffTitle": "未簽核列表",
+    "typeTitle": "類型",
+    "orderTitle": "單號",
+    "leaveForm": "請假單",
+    "overtimeForm": "加班單",
+    "flowStartTitle": "流程開啟時間",
+    "formCreatedAtTitle": "表單創建日期",
+    "formUserTitle": "起單人"
+  }
+}

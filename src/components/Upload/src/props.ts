@@ -85,12 +85,20 @@ export const uploadContainerProps = {
     type: Boolean as PropType<boolean>,
     default: false,
   },
+  disabled: {
+    type: Boolean as PropType<boolean>,
+    default: false,
+  },
 };
 
 export const previewProps = {
   value: {
     type: Array as PropType<string[]>,
     default: () => [],
+  },
+  disabled: {
+    type: Boolean as PropType<boolean>,
+    default: false,
   },
 };
 
@@ -114,5 +122,9 @@ export const fileListProps = {
   dragOptions: {
     type: Object as PropType<SortableOptions>,
     default: () => ({}),
+  },
+  disabled: {
+    type: Boolean as PropType<boolean>,
+    default: false,
   },
 };

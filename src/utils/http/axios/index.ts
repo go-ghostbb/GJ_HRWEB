@@ -100,7 +100,7 @@ const transform: AxiosTransform = {
       createMessage.error(timeoutMsg);
     }
     if (detail !== '') {
-      console.log(detail);
+      console.error(detail);
     }
     throw new Error(timeoutMsg || t('sys.api.apiRequestFailed'));
   },

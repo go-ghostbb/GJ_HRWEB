@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 import { store } from '@/store';
 import { RoleEnum } from '@/enums/roleEnum';
 import { PageEnum } from '@/enums/pageEnum';
-import { ROLES_KEY, TOKEN_KEY, EMPLOYEE_INFO_KEY } from '@/enums/cacheEnum';
+import { DEPARTMENT_KET, ROLES_KEY, TOKEN_KEY, EMPLOYEE_INFO_KEY } from '@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '@/utils/auth';
 import { GetEmployeeInfoModel, LoginParams } from '@/api/sys/model/employeeModel';
 import { doLogout, getEmployeeInfo, loginApi } from '@/api/sys/employee';
@@ -16,11 +16,13 @@ import { RouteRecordRaw } from 'vue-router';
 import { PAGE_NOT_FOUND_ROUTE } from '@/router/routes/basic';
 import { isArray } from '@/utils/is';
 import { h } from 'vue';
+import { DepartmentModel } from '@/api/database/department/model/departmentModel';
 
 interface EmployeeState {
   employeeInfo: Nullable<EmployeeInfo>;
   token?: string;
   roleList: RoleEnum[];
+  department?: DepartmentModel;
   lastUpdateTime: number;
 }
 
@@ -33,6 +35,8 @@ export const useEmployeeStore = defineStore({
     token: undefined,
     // roleList
     roleList: [],
+    // department
+    department: undefined,
     // Last fetch time
     lastUpdateTime: 0,
   }),
@@ -46,6 +50,9 @@ export const useEmployeeStore = defineStore({
     getRoleList(state): RoleEnum[] {
       return state.roleList.length > 0 ? state.roleList : getAuthCache<RoleEnum[]>(ROLES_KEY);
     },
+    getDepartment(state): DepartmentModel {
+      return state.department || getAuthCache<DepartmentModel>(DEPARTMENT_KET);
+    },
     getLastUpdateTime(state): number {
       return state.lastUpdateTime;
     },
@@ -58,6 +65,10 @@ export const useEmployeeStore = defineStore({
     setRoleList(roleList: RoleEnum[]) {
       this.roleList = roleList;
       setAuthCache(ROLES_KEY, roleList);
+    },
+    setDepartment(department: DepartmentModel) {
+      this.department = department;
+      setAuthCache(DEPARTMENT_KET, department);
     },
     setEmployeeInfo(info: EmployeeInfo | null) {
       if (info && info.avatar !== '') {
@@ -118,7 +129,7 @@ export const useEmployeeStore = defineStore({
     async getEmployeeInfoAction(): Promise<EmployeeInfo | null> {
       if (!this.getToken) return null;
       const employeeInfo = await getEmployeeInfo();
-      const { roles = [] } = employeeInfo;
+      const { roles = [], department } = employeeInfo;
       if (isArray(roles)) {
         const roleList = roles.map((item) => item.Code) as RoleEnum[];
         this.setRoleList(roleList);
@@ -126,6 +137,7 @@ export const useEmployeeStore = defineStore({
         employeeInfo.roles = [];
         this.setRoleList([]);
       }
+      this.setDepartment(department);
       this.setEmployeeInfo(employeeInfo);
       return employeeInfo;
     },

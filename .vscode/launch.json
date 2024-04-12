@@ -4,8 +4,8 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Launch Chrome",
-      "url": "http://localhost:3100",
+      "name": "Launch Arc",
+      "url": "http://localhost:5180",
       "webRoot": "${workspaceFolder}/src",
       "sourceMaps": true
     }

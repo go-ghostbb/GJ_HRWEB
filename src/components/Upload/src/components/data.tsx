@@ -5,6 +5,7 @@ import { Progress, Tag } from 'ant-design-vue';
 import TableAction from '@/components/Table/src/components/TableAction.vue';
 import ThumbUrl from './ThumbUrl.vue';
 import { useI18n } from '@/hooks/web/useI18n';
+import { useGlobSetting } from '@/hooks/setting';
 
 const { t } = useI18n();
 
@@ -97,7 +98,9 @@ export function createPreviewColumns(): BasicColumn[] {
       width: 100,
       customRender: ({ record }) => {
         const { url } = (record as PreviewFileItem) || {};
-        return isImgTypeByName(url) && <ThumbUrl fileUrl={url} />;
+        const { apiUrl = '' } = useGlobSetting();
+        const fullUrl = apiUrl + '/' + url;
+        return isImgTypeByName(fullUrl) && <ThumbUrl fileUrl={fullUrl} />;
       },
     },
     {

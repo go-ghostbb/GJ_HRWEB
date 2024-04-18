@@ -18,4 +18,12 @@ export const signOffRoutes: AppRouteRecordRaw[] = [
       title: t('signOff.overtime.title'),
     },
   },
+  {
+    path: '/sign-off/checkIn',
+    name: 'CheckInSignOff',
+    component: () => import('@/views/sign-off/check-in/index.vue'),
+    meta: {
+      title: t('signOff.checkIn.title'),
+    },
+  },
 ];

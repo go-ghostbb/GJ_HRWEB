@@ -7,41 +7,45 @@
     <div v-loading="loading" :class="contentClass">
       <!--標題-->
       <div class="text-center">
-        <h2 class="title">{{ t('signOff.leave.title') }}</h2>
+        <h2 class="title">{{ t('signOff.checkIn.title') }}</h2>
       </div>
 
       <!--分隔線-->
       <Divider :class="`${prefixCls}-divider`" />
 
-      <!--請假單訊息-->
+      <!--補打卡單訊息-->
       <Description
         :class="`${prefixCls}-description`"
         :column="{ xxl: 4, xl: 4, lg: 3, md: 3, sm: 2, xs: 1 }"
-        :data="leaveFormData"
+        :data="checkInFormData"
         :schema="infoDescSchema"
       />
 
-      <!--請假單內容-->
-      <Description
-        :class="`${prefixCls}-description`"
-        layout="vertical"
-        :column="{
-          md: detailDescSchema.length,
-          sm: detailDescSchema.length - 4,
-          xs: detailDescSchema.length - 6,
-        }"
-        :data="leaveFormData"
-        :schema="detailDescSchema"
-      />
+      <!--明細-->
+      <div class="sign-off-detail">
+        <BasicTable
+          :class="`${prefixCls}-table`"
+          :columns="detailColumns"
+          :dataSource="checkInFormData?.detail"
+          :bordered="true"
+          :showIndexColumn="false"
+          :striped="false"
+          :canResize="false"
+          :pagination="false"
+          :rowClassName="rowClassName"
+          :ellipsis="false"
+          size="small"
+        />
+      </div>
 
       <!--簽核意見-->
       <div v-if="showComment">
-        <span class="sign-off-comment">{{ t('signOff.leave.comment') }}</span>
+        <span class="sign-off-comment">{{ '簽核意見' }}</span>
         <Textarea
           :class="`${prefixCls}-textarea`"
           v-model:value="comment"
           :disabled="disableComment"
-          :placeholder="t('signOff.leave.commentPlaceholder')"
+          :placeholder="'請輸入簽核意見'"
           allow-clear
           :autoSize="{ minRows: 3 }"
         />
@@ -49,22 +53,20 @@
 
       <!--按鈕-->
       <div v-if="showButton" class="button">
-        <Button class="mr-2" type="primary" @click="handleApprove">{{
-          t('signOff.leave.approve')
-        }}</Button>
-        <Button type="primary" danger @click="handleReject">{{ t('signOff.leave.reject') }}</Button>
+        <Button class="mr-2" type="primary" @click="handleApprove">{{ '核准' }}</Button>
+        <Button type="primary" danger @click="handleReject">{{ '駁回' }}</Button>
       </div>
 
       <hr v-if="showComment || showButton" />
 
       <!--簽核歷程-->
       <div class="sign-off-history">
-        <h3 class="title">{{ t('signOff.leave.historyTitle') }}</h3>
+        <h3 class="title">{{ '簽核歷程(星號為此單關卡)' }}</h3>
         <Divider :class="`${prefixCls}-divider`" />
         <BasicTable
           :class="`${prefixCls}-table`"
           :columns="columns"
-          :dataSource="leaveFormData?.signOffFlow"
+          :dataSource="checkInFormData?.signOffFlow"
           :bordered="true"
           :showIndexColumn="false"
           :striped="false"
@@ -81,7 +83,7 @@
 <script lang="ts" setup>
   import { useDesign } from '@/hooks/web/useDesign';
   import { Description } from '@/components/Description';
-  import { infoDescSchema, detailDescSchema, columns } from './Leave.data';
+  import { infoDescSchema, columns, detailColumns } from './CheckIn.data';
   import { onMounted, reactive, ref, unref, watch, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
   import { BasicTable } from '@/components/Table';
@@ -95,15 +97,16 @@
   import type { LocaleType } from '#/config';
   import { useI18n } from '@/hooks/web/useI18n';
   import { Divider, Button, Textarea } from 'ant-design-vue';
-  import { getLeaveFormByUUID, leaveApprove, leaveReject } from '@/api/sign-off/leave';
-  import { LeaveRequestFormModel, SignNotify, SignStatus } from '@/api/daily/model/leaveModel';
+  import { CheckInRequestFormModel } from '@/api/daily/model/checkInModel';
+  import { checkInApprove, checkInReject, getCheckInFormByUUID } from '@/api/sign-off/checkIn';
+  import { SignNotify, SignStatus } from '@/api/daily/model/leaveModel';
 
   defineOptions({
-    name: 'LeaveSignOff',
+    name: 'CheckInSignOff',
     inheritAttrs: false,
   });
 
-  const { prefixCls } = useDesign('leave-sign-off');
+  const { prefixCls } = useDesign('checkIn-sign-off');
   const { t } = useI18n();
   const { createMessage } = useMessage();
   const route = useRoute();
@@ -122,8 +125,8 @@
   //-body的class
   const contentClass = reactive({});
 
-  //-leave form data
-  const leaveFormData = ref<LeaveRequestFormModel>();
+  //-checkIn form data
+  const checkInFormData = ref<CheckInRequestFormModel>();
 
   //-是否顯示按鈕
   const showButton = ref(false);
@@ -140,14 +143,14 @@
   /**
    * @description 獲取請假單內容
    */
-  const getLeaveFormDetail = async () => {
+  const getCheckInFormDetail = async () => {
     if (typeof uuid.value === 'string') {
       loading.value = true;
       //-取簽核資訊api
-      getLeaveFormByUUID(uuid.value)
+      getCheckInFormByUUID(uuid.value)
         .then((res) => {
-          leaveFormData.value = res;
-          leaveFormData.value.signOffFlow?.forEach((e) => {
+          checkInFormData.value = res;
+          checkInFormData.value?.signOffFlow?.forEach((e) => {
             if (uuid.value === e.uuid) {
               // 顯示按鈕，如果流程狀態=4(簽核中)
               showButton.value = e.status === SignStatus.SignStatusSigning;
@@ -174,7 +177,7 @@
   const currentLevel = () => {
     let result = -1;
     if (typeof uuid.value === 'string') {
-      leaveFormData.value?.signOffFlow?.forEach((e) => {
+      checkInFormData.value?.signOffFlow?.forEach((e) => {
         if (e.uuid === uuid.value) {
           result = e.level!;
           return;
@@ -215,10 +218,10 @@
   const handleApprove = () => {
     if (typeof uuid.value === 'string') {
       loading.value = true;
-      leaveApprove(uuid.value, comment.value)
+      checkInApprove(uuid.value, comment.value)
         .then(async () => {
-          createMessage.success(t('signOff.leave.approveSucc'));
-          await getLeaveFormDetail();
+          createMessage.success('核准成功');
+          await getCheckInFormDetail();
         })
         .finally(() => {
           loading.value = false;
@@ -232,10 +235,10 @@
   const handleReject = () => {
     if (typeof uuid.value === 'string') {
       loading.value = true;
-      leaveReject(uuid.value, comment.value)
+      checkInReject(uuid.value, comment.value)
         .then(async () => {
-          createMessage.success(t('signOff.leave.rejectSucc'));
-          await getLeaveFormDetail();
+          createMessage.success('駁回成功');
+          await getCheckInFormDetail();
         })
         .finally(() => {
           loading.value = false;
@@ -259,7 +262,7 @@
       await changeLocale(locale.value as LocaleType);
       location.reload();
     } else {
-      getLeaveFormDetail();
+      getCheckInFormDetail();
       //-資料抓取完畢，給body一個class，為了爬蟲用
       contentClass[`${prefixCls}-content`] = true;
     }
@@ -281,7 +284,7 @@
 </script>
 
 <style lang="less">
-  @prefix-cls: ~'@{namespace}-leave-sign-off';
+  @prefix-cls: ~'@{namespace}-checkIn-sign-off';
 
   .@{prefix-cls} {
     &-content {
@@ -294,6 +297,10 @@
         margin-top: 20px;
         margin-bottom: 10px;
         font-size: 30px;
+      }
+
+      .sign-off-detail {
+        padding-bottom: 20px;
       }
 
       .sign-off-comment {
@@ -395,7 +402,7 @@
 
               .ant-table-cell {
                 border-bottom: 1px solid #f0f0f0 !important;
-                background: #fafafa !important;
+                background: #fafafa;
                 color: black;
                 border-inline-end: 1px solid #f0f0f0 !important;
               }

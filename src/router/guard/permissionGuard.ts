@@ -12,10 +12,16 @@ import { RootRoute } from '@/router/routes';
 const LOGIN_PATH = PageEnum.BASE_LOGIN;
 const LEAVE_SIGN_OFF_PAGE = PageEnum.LEAVE_SIGN_OFF_PAGE;
 const OVERTIME_SIGN_OFF_PAGE = PageEnum.OVERTIME_SIGN_OFF_PAGE;
+const CHECKIN_SIGN_OFF_PAGE = PageEnum.CHECKIN_SIGN_OFF_PAGE;
 
 const ROOT_PATH = RootRoute.path;
 
-const whitePathList: PageEnum[] = [LOGIN_PATH, LEAVE_SIGN_OFF_PAGE, OVERTIME_SIGN_OFF_PAGE];
+const whitePathList: PageEnum[] = [
+  LOGIN_PATH,
+  LEAVE_SIGN_OFF_PAGE,
+  OVERTIME_SIGN_OFF_PAGE,
+  CHECKIN_SIGN_OFF_PAGE,
+];
 
 export function createPermissionGuard(router: Router) {
   const userStore = useEmployeeStoreWithOut();

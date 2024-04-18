@@ -133,7 +133,7 @@
   });
 
   //-modal入口
-  const [registerModal, { setModalProps, closeModal }] = useModalInner(
+  const [registerModal, { setModalProps, closeModal, changeLoading }] = useModalInner(
     async (data: { isUpdate: boolean; disabled: boolean; record: LeaveRequestFormModel }) => {
       //-reset
       setModalProps({ confirmLoading: false });
@@ -193,6 +193,7 @@
       return;
     }
     try {
+      setModalProps({ confirmLoading: true });
       const form = await validate();
       if (form) {
         //-寫入ID
@@ -200,7 +201,7 @@
 
         //-時間判斷，是否有超過最低表準
         if (timeJudge(form.date!, form.time!)) {
-          saveLeaveForm(form).then((res) => {
+          saveLeaveForm(form as LeaveBasicForm).then((res) => {
             closeModal();
             emit('success', { isUpdate: unref(isUpdate), result: res });
           });
@@ -212,7 +213,7 @@
             title: t('daily.global.warning'),
             content: t('daily.leave.modal.minimumWarning').replaceAll('#', String(Minimum)),
             onOk: () => {
-              saveLeaveForm(form).then((res) => {
+              saveLeaveForm(form as LeaveBasicForm).then((res) => {
                 closeModal();
                 emit('success', { isUpdate: unref(isUpdate), result: res });
               });
@@ -229,10 +230,13 @@
    * @description 刪除請假單
    */
   const handleDelete = async () => {
-    deleteLeaveForm(id.value).then(() => {
-      closeModal();
-      emit('delete', { order: order.value });
-    });
+    changeLoading(true);
+    deleteLeaveForm(id.value)
+      .then(() => {
+        closeModal();
+        emit('delete', { order: order.value });
+      })
+      .finally(() => changeLoading(false));
   };
 
   /**

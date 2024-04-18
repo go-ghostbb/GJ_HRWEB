@@ -10,5 +10,6 @@ export enum PageEnum {
   // sign off path
   LEAVE_SIGN_OFF_PAGE = '/sign-off/leave',
   OVERTIME_SIGN_OFF_PAGE = '/sign-off/overtime',
+  CHECKIN_SIGN_OFF_PAGE = '/sign-off/checkIn',
 }
 export const PageWrapperFixedHeightKey = 'PageWrapperFixedHeight';

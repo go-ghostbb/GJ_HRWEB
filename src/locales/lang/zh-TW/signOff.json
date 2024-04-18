@@ -75,5 +75,8 @@
     "signDateTitle": "覆核日期",
     "intervalTitle": "區間(單位:小時)",
     "multiplyTitle": "倍率"
+  },
+  "checkIn": {
+    "title": "補打卡單"
   }
 }

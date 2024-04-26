@@ -34,7 +34,8 @@ export interface LeaveBasicForm {
   proxyEmployeeId?: number;
   leaveId?: number;
   date?: string[];
-  time?: string[];
+  startTime?: string;
+  endTime?: string;
   attach?: string[];
   remark?: string;
 }

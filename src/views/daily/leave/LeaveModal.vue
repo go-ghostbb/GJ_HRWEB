@@ -200,7 +200,7 @@
         form.ID = id.value;
 
         //-時間判斷，是否有超過最低表準
-        if (timeJudge(form.date!, form.time!)) {
+        if (timeJudge(form.date!, [form.startTime!, form.endTime!])) {
           saveLeaveForm(form as LeaveBasicForm).then((res) => {
             closeModal();
             emit('success', { isUpdate: unref(isUpdate), result: res });
@@ -255,7 +255,7 @@
 
     const Minimum = leaveMinimum.value || originMinimum.value;
 
-    return diffMins * diffDays > Minimum!;
+    return Math.abs(diffMins) * diffDays > Minimum!;
   };
 
   /**
@@ -278,7 +278,8 @@
       proxyEmployeeId: record.proxyEmployeeId,
       leaveId: record.leaveId,
       date: [record.startDate!, record.endDate!],
-      time: [record.startTime!, record.endTime!],
+      startTime: record.startTime,
+      endTime: record.endTime,
       attach: record.attach ? record.attach?.split(',') : [],
       remark: record.remark,
     };

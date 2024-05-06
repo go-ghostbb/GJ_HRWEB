@@ -11,7 +11,7 @@
       </div>
 
       <!--分隔線-->
-      <a-divider :class="`${prefixCls}-divider`" />
+      <Divider :class="`${prefixCls}-divider`" />
 
       <!--加班單訊息-->
       <Description
@@ -23,24 +23,21 @@
 
       <!--加班單內容-->
       <Description
-        :class="`${prefixCls}-description`"
+        :class="[`${prefixCls}-description`, `${prefixCls}-detail-description`]"
         layout="vertical"
-        :column="{
-          md: detailDescSchema.length,
-          sm: detailDescSchema.length - 2,
-        }"
+        :column="detailDescSchema.length"
         :data="overtimeFormData"
         :schema="detailDescSchema"
       />
 
-      <!--請假單內容-->
+      <!--加班單內容-->
       <div>
-        <span class="sign-off-multiply">{{ t('signOff.overtime.multiply') }}</span>
+        <!--<span class="sign-off-multiply">{{ t('signOff.overtime.multiply') }}</span>-->
         <BasicTable
           class="mb-4"
           :class="`${prefixCls}-rate-table`"
           :columns="rateColumns"
-          :dataSource="overtimeFormData?.type.rate"
+          :dataSource="overtimeFormData?.rate"
           :bordered="true"
           :showIndexColumn="false"
           :striped="false"
@@ -54,7 +51,7 @@
       <!--簽核意見-->
       <div v-if="showComment">
         <span class="sign-off-comment">{{ t('signOff.overtime.comment') }}</span>
-        <a-textarea
+        <Textarea
           :class="`${prefixCls}-textarea`"
           v-model:value="comment"
           :disabled="disableComment"
@@ -66,12 +63,12 @@
 
       <!--按鈕-->
       <div v-if="showButton" class="button">
-        <a-button class="mr-2" type="primary" @click="handleApprove">{{
+        <Button class="mr-2" type="primary" @click="handleApprove">{{
           t('signOff.overtime.approve')
-        }}</a-button>
-        <a-button type="primary" danger @click="handleReject">{{
+        }}</Button>
+        <Button type="primary" danger @click="handleReject">{{
           t('signOff.overtime.reject')
-        }}</a-button>
+        }}</Button>
       </div>
 
       <hr v-if="showComment || showButton" />
@@ -79,11 +76,11 @@
       <!--簽核歷程-->
       <div class="sign-off-history">
         <h3 class="title">{{ t('signOff.overtime.historyTitle') }}</h3>
-        <a-divider :class="`${prefixCls}-divider`" />
+        <Divider :class="`${prefixCls}-divider`" />
         <BasicTable
           :class="`${prefixCls}-history-table`"
           :columns="columns"
-          :dataSource="overtimeFormData?.flow"
+          :dataSource="overtimeFormData?.signOffFlow"
           :bordered="true"
           :showIndexColumn="false"
           :striped="false"
@@ -105,7 +102,6 @@
   import { useRoute } from 'vue-router';
   import { AppLocalePicker } from '@/components/Application';
   import { BasicTable } from '@/components/Table';
-  // import { useMessage } from '@/hooks/web/useMessage';
   import { updateDarkTheme } from '@/logics/theme/dark';
   import { useRootSetting } from '@/hooks/setting/useRootSetting';
   import { ThemeEnum } from '@/enums/appEnum';
@@ -113,6 +109,11 @@
   import { useLocale } from '@/locales/useLocale';
   import { LocaleType } from '#/config';
   import { useI18n } from '@/hooks/web/useI18n';
+  import { SignNotify, SignStatus } from '@/api/daily/model/leaveModel';
+  import { getOvertimeFormByUUID, overtimeApprove, overtimeReject } from '@/api/sign-off/overtime';
+  import { OvertimeRequestFormModel } from '@/api/daily/model/overtimeModel';
+  import { useMessage } from '@/hooks/web/useMessage';
+  import { Divider, Button, Textarea } from 'ant-design-vue';
 
   defineOptions({
     name: 'SignOff',
@@ -121,52 +122,78 @@
 
   const { prefixCls } = useDesign('overtime-sign-off');
   const { t } = useI18n();
-  // const { createMessage } = useMessage();
+  const { createMessage } = useMessage();
   const route = useRoute();
   const { getDarkMode } = useRootSetting();
   const { changeLocale, getLocale } = useLocale();
 
   const uuid = ref(route.query?.uuid);
   const locale = ref(route.query?.locale);
+
+  //-判斷說是不是為了生成pdf
   const isPDF = ref(route.query?.pdf);
+
+  //-loading
   const loading = ref(false);
+
+  //-body的class
   const contentClass = reactive({});
 
-  const overtimeFormData = ref();
+  //-overtime form data
+  const overtimeFormData = ref<OvertimeRequestFormModel>();
+
+  //-是否顯示按鈕
   const showButton = ref(false);
+
+  //-是否顯示comment
   const showComment = ref(false);
+
+  //-是否關閉comment
   const disableComment = ref(false);
+
+  //-comment內容
   const comment = ref('');
 
+  /**
+   * @description 獲取加班單內容
+   */
   const getOvertimeFormDetail = async () => {
     if (typeof uuid.value === 'string') {
       loading.value = true;
-      // TODO: 獲取加班資訊api
-      // overtimeFormData.value = await overtimeFormDetailApi({ uuid: uuid.value });
-      // overtimeFormData.value?.flow.forEach((e) => {
-      //   if (typeof uuid.value === 'string' && e.uuid === uuid.value) {
-      //     // 顯示按鈕，如果流程狀態=4(簽核中)
-      //     showButton.value = e.status === 4;
-      //     // 顯示簽核意見，如果簽核類型!=4(最後一關的完成後通知)
-      //     showComment.value = e.signType !== 3;
-      //     // 禁止編輯簽核意見，如果流程狀態!=4(已簽)
-      //     disableComment.value = e.status !== 4;
-      //     // 傳入簽核意見(檢視用)
-      //     comment.value = e.comment;
-      //   }
-      // });
-      loading.value = false;
-      // 渲染完成加上完成class，方便PDF辨識
-      contentClass[`${prefixCls}-content-done`] = true;
+      //-取簽核資訊api
+      getOvertimeFormByUUID(uuid.value)
+        .then((res) => {
+          overtimeFormData.value = res;
+          overtimeFormData.value?.signOffFlow?.forEach((e) => {
+            if (uuid.value === e.uuid) {
+              // 顯示按鈕，如果流程狀態=4(簽核中)
+              showButton.value = e.status === SignStatus.SignStatusSigning;
+              // 顯示簽核意見，如果簽核類型!=4(最後一關的完成後通知)
+              showComment.value = e.notify === SignNotify.SignOffPlusNotify;
+              // 禁止編輯簽核意見，如果流程狀態!=4(已簽)
+              disableComment.value = e.status !== SignStatus.SignStatusSigning;
+              // 傳入簽核意見(檢視用)
+              comment.value = e.comment!;
+            }
+          });
+        })
+        .finally(() => {
+          loading.value = false;
+          // 渲染完成加上完成class，方便PDF辨識
+          contentClass[`${prefixCls}-content-done`] = true;
+        });
     }
   };
 
+  /**
+   * @description 查詢本關卡level
+   */
   const currentLevel = () => {
     let result = -1;
     if (typeof uuid.value === 'string') {
-      overtimeFormData.value?.flow.forEach((e) => {
+      overtimeFormData.value?.signOffFlow?.forEach((e) => {
         if (e.uuid === uuid.value) {
-          result = e.level;
+          result = e.level!;
           return;
         }
       });
@@ -174,46 +201,64 @@
     return result;
   };
 
+  /**
+   * @description 判斷流程該給核准或是駁回class
+   * @param record
+   * @param _index
+   */
   const rowClassName = (record: Recordable<any>, _index: number) => {
     if (record.level === currentLevel()) {
       record.level = `*${record.level}`;
     }
-    if (record.status === 1 || record.status === 3) {
+    if (
+      record.status === SignStatus.SignStatusApprove ||
+      record.status === SignStatus.SignStatusOnlyNotifySuc
+    ) {
       return 'approve';
     }
-    if (record.status === 2 || record.status === 5) {
+
+    if (
+      record.status === SignStatus.SignStatusReject ||
+      record.status === SignStatus.SignStatusOnlyNotifyFail
+    ) {
       return 'reject';
     }
     return '';
   };
 
+  /**
+   * @description 核准
+   */
   const handleApprove = () => {
     if (typeof uuid.value === 'string') {
       loading.value = true;
-      // TODO: 簽核api
-      // approveApi({ uuid: uuid.value, comment: comment.value })
-      //   .then(async () => {
-      //     createMessage.success(t('signOff.overtime.approveSucc'));
-      //     await getOvertimeFormDetail();
-      //   })
-      //   .finally(() => {
-      //     loading.value = false;
-      //   });
+      // 簽核api
+      overtimeApprove(uuid.value, comment.value)
+        .then(async () => {
+          createMessage.success(t('signOff.leave.approveSucc'));
+          await getOvertimeFormDetail();
+        })
+        .finally(() => {
+          loading.value = false;
+        });
     }
   };
 
+  /**
+   * @description 駁回
+   */
   const handleReject = () => {
     if (typeof uuid.value === 'string') {
       loading.value = true;
-      // TODO: 駁回api
-      // rejectApi({ uuid: uuid.value, comment: comment.value })
-      //   .then(async () => {
-      //     createMessage.success(t('signOff.overtime.rejectSucc'));
-      //     await getOvertimeFormDetail();
-      //   })
-      //   .finally(() => {
-      //     loading.value = false;
-      //   });
+      // 駁回api
+      overtimeReject(uuid.value, comment.value)
+        .then(async () => {
+          createMessage.success(t('signOff.leave.rejectSucc'));
+          await getOvertimeFormDetail();
+        })
+        .finally(() => {
+          loading.value = false;
+        });
     }
   };
 
@@ -327,6 +372,13 @@
             }
           }
         }
+      }
+    }
+
+    &-detail-description {
+      .ant-descriptions-item-label,
+      .ant-descriptions-item-content {
+        text-align: center;
       }
     }
 

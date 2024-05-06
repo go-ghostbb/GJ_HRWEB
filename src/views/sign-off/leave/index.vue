@@ -147,7 +147,7 @@
       getLeaveFormByUUID(uuid.value)
         .then((res) => {
           leaveFormData.value = res;
-          leaveFormData.value.signOffFlow?.forEach((e) => {
+          leaveFormData.value?.signOffFlow?.forEach((e) => {
             if (uuid.value === e.uuid) {
               // 顯示按鈕，如果流程狀態=4(簽核中)
               showButton.value = e.status === SignStatus.SignStatusSigning;

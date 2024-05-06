@@ -13,6 +13,7 @@ export interface OvertimeRequestFormModel extends BasicDatabaseModel {
   departmentId: number;
   department?: DepartmentModel;
   signOffFlow?: OvertimeSignOffFlow[];
+  rate?: OvertimeRequestFormRate[];
 }
 
 export interface OvertimeSignOffFlow extends BasicDatabaseModel {
@@ -29,6 +30,16 @@ export interface OvertimeSignOffFlow extends BasicDatabaseModel {
   signDate?: Date;
   uuid?: string;
   locale?: string;
+}
+
+export interface OvertimeRequestFormRate extends BasicDatabaseModel {
+  overtimeRequestFormId?: number;
+  overtimeRequestForm?: OvertimeRequestFormModel;
+  hours?: number;
+  multiply?: number;
+  level?: number;
+  isFill?: boolean;
+  fill?: number;
 }
 
 export interface GetOvertimeFormByEmployeeParams extends BasicPageParams {

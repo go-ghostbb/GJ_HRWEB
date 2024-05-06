@@ -1,6 +1,10 @@
 import { DescItem } from '@/components/Description';
 import { BasicColumn } from '@/components/Table';
 import { useI18n } from '@/hooks/web/useI18n';
+import { SignNotify, SignStatus, SignType } from '@/api/daily/model/leaveModel';
+import dayjs from 'dayjs';
+import { EmployeeModel } from '@/api/database/employee/model/employeeModel';
+import { DepartmentModel } from '@/api/database/department/model/departmentModel';
 
 const { t } = useI18n();
 
@@ -11,15 +15,25 @@ export const infoDescSchema: DescItem[] = [
   },
   {
     field: 'createdAt',
-    label: t('signOff.overtime.createdAtTitle'),
+    label: t('signOff.leave.createdAtTitle'),
+    render: (val: Date, _record) => {
+      const date = dayjs(val);
+      return date.format('YYYY-MM-DD');
+    },
   },
   {
-    field: 'user',
-    label: t('signOff.overtime.userTitle'),
+    field: 'employee',
+    label: t('signOff.leave.userTitle'),
+    render: (val: EmployeeModel, _record) => {
+      return val.realName;
+    },
   },
   {
     field: 'department',
-    label: t('signOff.overtime.departmentTitle'),
+    label: t('signOff.leave.departmentTitle'),
+    render: (val: DepartmentModel, _record) => {
+      return val.name;
+    },
   },
   {
     field: 'remark',
@@ -29,10 +43,10 @@ export const infoDescSchema: DescItem[] = [
 
 export const detailDescSchema: DescItem[] = [
   {
-    field: 'type',
+    field: 'vacation',
     label: t('signOff.overtime.typeTitle'),
     render: (val, _record) => {
-      return <div>{val.typeName}</div>;
+      return <div>{val.name}</div>;
     },
   },
   {
@@ -44,34 +58,31 @@ export const detailDescSchema: DescItem[] = [
     label: t('signOff.overtime.endTimeTitle'),
   },
   {
-    field: 'expectHour',
-    label: t('signOff.overtime.expectHourTitle'),
-  },
-  {
-    field: 'expectMinute',
-    label: t('signOff.overtime.expectMinuteTitle'),
+    field: 'estimatedHours',
+    label: '預計加班時數',
   },
 ];
 
 export const columns: BasicColumn[] = [
   {
-    title: t('signOff.overtime.levelTitle'),
-    dataIndex: 'level',
+    title: t('signOff.leave.levelTitle'),
     width: 100,
+    customRender: ({ record }) => {
+      return record.level;
+    },
   },
   {
-    title: t('signOff.overtime.signOffUserTitle'),
-    dataIndex: 'signOffUser',
+    title: t('signOff.leave.signOffUserTitle'),
     width: 100,
     customRender: ({ record }) => {
       const notify = record.notify;
-      const user = record.signOffUser;
-      return notify === 2 ? (
+      const user = record.signOffEmployee.realName;
+      return notify === SignNotify.NotifyOnly ? (
         <div>
           {user}
           <span>
             {'('}
-            <b>{t('signOff.overtime.onlyNotify')}</b>
+            <b>{t('signOff.leave.onlyNotify')}</b>
             {')'}
           </span>
         </div>
@@ -81,70 +92,86 @@ export const columns: BasicColumn[] = [
     },
   },
   {
-    title: t('signOff.overtime.signTypeTitle'),
-    dataIndex: 'signType',
+    title: t('signOff.leave.signTypeTitle'),
     width: 100,
     customRender: ({ record }) => {
       const signType = record.signType;
       let text = '';
       switch (signType) {
-        case 1:
-          text = t('signOff.overtime.manager');
+        case SignType.DepartmentManager:
+          text = t('signOff.leave.manager');
           break;
-        case 2:
-          text = t('signOff.overtime.user');
+        case SignType.SpecificEmployee:
+          text = t('signOff.leave.user');
           break;
-        case 3:
-          text = t('signOff.overtime.own');
+        case SignType.Agent:
+          text = t('signOff.leave.proxy');
           break;
       }
       return text;
     },
   },
   {
-    title: t('signOff.overtime.statusTitle'),
+    title: t('signOff.leave.statusTitle'),
     dataIndex: 'status',
     width: 100,
     customRender: ({ record }) => {
       const status = record.status;
       let text = '';
       switch (status) {
-        case 1:
-          text = t('signOff.overtime.approve');
+        case SignStatus.SignStatusApprove:
+          text = t('signOff.leave.approve');
           break;
-        case 2:
-          text = t('signOff.overtime.reject');
+        case SignStatus.SignStatusReject:
+          text = t('signOff.leave.reject');
           break;
-        case 3:
-          text = t('signOff.overtime.notifySucc');
+        case SignStatus.SignStatusOnlyNotifySuc:
+          text = t('signOff.leave.notifySucc');
           break;
-        case 4:
-          text = t('signOff.overtime.signing');
+        case SignStatus.SignStatusSigning:
+          text = t('signOff.leave.signing');
           break;
-        case 5:
-          text = t('signOff.overtime.notifyErr');
+        case SignStatus.SignStatusOnlyNotifyFail:
+          text = t('signOff.leave.notifyErr');
           break;
       }
       return text;
     },
   },
   {
-    title: t('signOff.overtime.commentTitle'),
-    dataIndex: 'comment',
+    title: t('signOff.leave.commentTitle'),
     width: 100,
+    customRender: ({ record }) => {
+      return record.comment;
+    },
   },
   {
-    title: t('signOff.overtime.signDateTitle'),
-    dataIndex: 'signDate',
+    title: t('signOff.leave.signDateTitle'),
     width: 100,
+    customRender: ({ record }) => {
+      const date = dayjs(record.signDate);
+      if (date.isSame('0001-01-01', 'year')) {
+        return '';
+      } else {
+        return date.format('YYYY-MM-DD HH:mm:ss');
+      }
+    },
   },
 ];
 
 export const rateColumns: BasicColumn[] = [
   {
-    title: t('signOff.overtime.intervalTitle'),
+    title: '加班開始時數',
+    dataIndex: 'hours',
+  },
+  {
+    title: '自動填滿',
     customRender: ({ record }) => {
-      return `${record.start} - ${record.end}`;
+      if (record.isFill) {
+        return record.fill;
+      }
+
+      return '-';
     },
   },
   {

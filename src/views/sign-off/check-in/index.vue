@@ -24,7 +24,7 @@
       <!--明細-->
       <div class="sign-off-detail">
         <BasicTable
-          :class="`${prefixCls}-table`"
+          :class="`${prefixCls}-detail-table`"
           :columns="detailColumns"
           :dataSource="checkInFormData?.detail"
           :bordered="true"
@@ -64,7 +64,7 @@
         <h3 class="title">{{ '簽核歷程(星號為此單關卡)' }}</h3>
         <Divider :class="`${prefixCls}-divider`" />
         <BasicTable
-          :class="`${prefixCls}-table`"
+          :class="`${prefixCls}-history-table`"
           :columns="columns"
           :dataSource="checkInFormData?.signOffFlow"
           :bordered="true"
@@ -387,7 +387,7 @@
       background-color: #7cb305;
     }
 
-    &-table {
+    &-history-table {
       font-size: 15px;
 
       .ant-table-container {
@@ -442,6 +442,66 @@
                 .ant-table-cell-row-hover {
                   background-color: #fcc !important;
                 }
+              }
+            }
+          }
+        }
+      }
+
+      .ant-table-wrapper {
+        padding: 0;
+      }
+
+      .ant-table {
+        background: #fff;
+      }
+    }
+
+    &-detail-table {
+      font-size: 15px;
+
+      .ant-table-container {
+        border-inline-start: 1px solid #f0f0f0 !important;
+
+        .ant-table-content {
+          table {
+            border-top: 1px solid #f0f0f0 !important;
+
+            .ant-table-thead {
+              border-bottom: 1px solid #f0f0f0 !important;
+
+              .ant-table-cell {
+                border-bottom: 1px solid #f0f0f0 !important;
+                background: #f0f0f0 !important;
+                color: black;
+                border-inline-end: 1px solid #f0f0f0 !important;
+
+                span {
+                  font-size: 15px;
+                }
+              }
+            }
+
+            .ant-table-tbody {
+              .ant-table-cell {
+                border-inline-end: 1px solid #f0f0f0 !important;
+                border-bottom: 1px solid #f0f0f0 !important;
+                color: black;
+
+                .ant-table-expanded-row-fixed {
+                  .ant-empty-normal {
+                    color: rgb(0 0 0 / 25%);
+                  }
+                }
+
+                .ant-table-expanded-row-fixed::after {
+                  border-inline-end: 1px solid #f0f0f0 !important;
+                }
+              }
+
+              .ant-table-cell,
+              .ant-table-cell-row-hover {
+                background-color: #fff !important;
               }
             }
           }

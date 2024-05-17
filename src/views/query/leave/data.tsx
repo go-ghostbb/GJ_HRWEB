@@ -49,7 +49,7 @@ export const searchFormSchema: FormSchema[] = [
     componentProps: {
       options: createSearchSelectOptions(),
     },
-    colProps: { span: 8 },
+    colProps: { span: 4 },
   },
 ];
 

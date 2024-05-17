@@ -192,8 +192,8 @@
       closeModal();
       return;
     }
+    changeLoading(true);
     try {
-      setModalProps({ confirmLoading: true });
       const form = await validate();
       if (form) {
         //-寫入ID
@@ -222,7 +222,7 @@
         }
       }
     } finally {
-      setModalProps({ confirmLoading: false });
+      changeLoading(false);
     }
   };
 

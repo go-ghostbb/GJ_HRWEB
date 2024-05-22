@@ -188,11 +188,13 @@
    * @description 儲存
    */
   const handleSave = async () => {
+    setModalProps({ confirmLoading: true });
+
     if (unref(disabled)) {
       closeModal();
       return;
     }
-    changeLoading(true);
+
     try {
       const form = await validate();
       if (form) {
@@ -201,10 +203,9 @@
 
         //-時間判斷，是否有超過最低表準
         if (timeJudge(form.date!, [form.startTime!, form.endTime!])) {
-          saveLeaveForm(form as LeaveBasicForm).then((res) => {
-            closeModal();
-            emit('success', { isUpdate: unref(isUpdate), result: res });
-          });
+          const res = await saveLeaveForm(form as LeaveBasicForm);
+          closeModal();
+          emit('success', { isUpdate: unref(isUpdate), result: res });
         } else {
           //-假設沒超過最低要求，提醒使用者
           const Minimum = leaveMinimum.value || originMinimum.value;
@@ -212,17 +213,16 @@
             iconType: 'warning',
             title: t('daily.global.warning'),
             content: t('daily.leave.modal.minimumWarning').replaceAll('#', String(Minimum)),
-            onOk: () => {
-              saveLeaveForm(form as LeaveBasicForm).then((res) => {
-                closeModal();
-                emit('success', { isUpdate: unref(isUpdate), result: res });
-              });
+            onOk: async () => {
+              const res = await saveLeaveForm(form as LeaveBasicForm);
+              closeModal();
+              emit('success', { isUpdate: unref(isUpdate), result: res });
             },
           });
         }
       }
     } finally {
-      changeLoading(false);
+      setModalProps({ confirmLoading: false });
     }
   };
 

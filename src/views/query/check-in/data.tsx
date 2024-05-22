@@ -169,35 +169,38 @@ export const column: BasicColumn[] = [
     title: '缺勤時數',
     width: 100,
     customRender: ({ record }) => {
-      return record.absenceHours;
+      if (record.absenceHours <= 0) {
+        return 0;
+      }
+      return Math.round(record.absenceHours * 100) / 100;
     },
   },
   {
     title: '請假時數',
     width: 100,
     customRender: ({ record }) => {
-      return record.leaveHours;
+      return Math.round(record.leaveHours * 100) / 100;
     },
   },
   {
     title: '簽核中的請假時數',
     width: 100,
     customRender: ({ record }) => {
-      return record.signLeaveHours;
+      return Math.round(record.signLeaveHours * 100) / 100;
     },
   },
   {
     title: '加班時數',
     width: 100,
     customRender: ({ record }) => {
-      return record.overtimeHours;
+      return Math.round(record.overtimeHours * 100) / 100;
     },
   },
   {
     title: '簽核中的加班時數',
     width: 100,
     customRender: ({ record }) => {
-      return record.signOvertimeHours;
+      return Math.round(record.signOvertimeHours * 100) / 100;
     },
   },
 ];

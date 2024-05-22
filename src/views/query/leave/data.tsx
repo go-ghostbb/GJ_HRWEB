@@ -23,19 +23,19 @@ export const column: BasicColumn[] = [
   {
     title: '可用天數',
     customRender: ({ record }) => {
-      return record.available;
+      return Math.round(record.available * 100) / 100;
     },
   },
   {
     title: '簽核中天數',
     customRender: ({ record }) => {
-      return record.signing;
+      return Math.round(record.signing * 100) / 100;
     },
   },
   {
     title: '已使用天數',
     customRender: ({ record }) => {
-      return record.used;
+      return Math.round(record.used * 100) / 100;
     },
   },
 ];

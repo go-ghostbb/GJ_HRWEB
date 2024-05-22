@@ -157,10 +157,9 @@
       }
 
       //-api
-      saveCheckInForm(result).then((res) => {
-        closeModal();
-        emit('success', { isUpdate: unref(isUpdate), result: res });
-      });
+      const res = saveCheckInForm(result);
+      closeModal();
+      emit('success', { isUpdate: unref(isUpdate), result: res });
     } finally {
       setModalProps({ confirmLoading: false });
     }

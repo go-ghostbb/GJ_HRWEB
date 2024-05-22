@@ -118,10 +118,9 @@
       result.id = id.value;
 
       //-api
-      saveOvertimeForm(result).then((res) => {
-        closeModal();
-        emit('success', { isUpdate: unref(isUpdate), result: res });
-      });
+      const res = saveOvertimeForm(result);
+      closeModal();
+      emit('success', { isUpdate: unref(isUpdate), result: res });
     } finally {
       setModalProps({ confirmLoading: false });
     }

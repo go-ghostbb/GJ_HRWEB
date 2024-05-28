@@ -43,7 +43,7 @@ export const columns: BasicColumn[] = [
     title: '建立時間',
     width: 100,
     customRender: ({ record }) => {
-      const date = dayjs(record.createdAt);
+      const date = dayjs(record.CreatedAt);
       return date.format('YYYY-MM-DD');
     },
   },

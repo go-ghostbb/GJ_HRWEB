@@ -46,7 +46,7 @@ export const columns: BasicColumn[] = [
     title: t('daily.leave.createdAtTitle'),
     width: 100,
     customRender: ({ record }) => {
-      const date = dayjs(record.createdAt);
+      const date = dayjs(record.CreatedAt);
       return date.format('YYYY-MM-DD');
     },
   },
